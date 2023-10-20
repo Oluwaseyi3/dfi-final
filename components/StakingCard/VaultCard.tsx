@@ -537,13 +537,6 @@ const VaultCard: React.FC<Props> = (props: Props): React.ReactElement => {
                                 }}
                             >
                                 <Outline
-                                    style={{
-                                        height: '38px',
-                                        margin: '12px auto',
-                                        width: '80%',
-                                        padding: '0px',
-                                        display: 'block',
-                                    }}
                                     disabled={props.disabled || (approvedRef && !formattedBalance)}
                                     onClick={() => {
                                         if (approvedRef) {
