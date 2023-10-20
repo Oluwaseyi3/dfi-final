@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { Layout, Row, Col,  } from 'antd';
 import styled from 'styled-components';
 import  { useState } from 'react';
-import OutlinedButton from '../components/Button/Outline';
+import Outline from '../components/Button/Outline';
 import RewardCard from '../components/RewardCard';
 import { formatNumber, getNamedAddress } from '../util';
 // import useContract from '../hooks/useContract';
@@ -20,47 +20,63 @@ import { formatUnits, parseEther } from '@ethersproject/units';
 interface RowContainerProps {
     dark?: boolean;
 }
+    const RowContainer = ({ children }:any) => {
+        const containerStyle = {
+          width: '100vw',
+          background: '#ffffff',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: '100px',
+        };
+      
+        const pStyle = {
+          marginTop: '10px',
+        };
+      
+        const mediaStyle = {
+          padding: '30px',
+        };
+      
+        return (
+          <Row style={containerStyle}>
+            <div>{children}</div>
+            <p style={pStyle}>Content goes here</p>
+          </Row>
+        );
+      };
+      
+      const LandingRow = ({ children }:any) => {
+        const rowStyle = {
+          maxWidth: '1500px', // Replace with your desired maxWidth
+          width: '100%',
+        };
+      
+        return <Row style={rowStyle}>{children}</Row>;
+      };
 
-const RowContainer = styled.div<RowContainerProps>`
-  width: 100vw;
-  background: ${(props) => props.theme.white + ' 0% 0% no-repeat padding-box'};
 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 100px;
+      const LandingCol = ({ children }:any) => {
+        const colStyle = {
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        };
+      
+        const colSmStyle = {
+          paddingTop: '50px',
+        };
+      
+        return (
+          <Col style={colSmStyle} sm={24} lg={8}>
+            {children}
+          </Col>
+        );
+      };
 
-  p {
-      margin-top: 10px;
-  }
 
-  @media (max-width: 768px) {
-      padding: 30px;
-  }
-`;
-const LandingRow = styled(Row)`
-    max-width: ${(props) => props.theme.maxWidth};
-    width: 100%;
-
-`;
-
-const LandingCol = styled(Col)`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    @media (max-width: 768px) {
-        padding-top: 50px;
-    }
-`;
-
-const SecondaryBox = styled(Image)`
-    @media (max-width: 768px) {
-        width: 120% !important;
-        margin-left: -10% !important;
-    }
-`;
+      
 
 const Box = styled.img`
     @media (max-width: 768px) {
@@ -83,11 +99,13 @@ const BoxHeader = styled.div`
   width: 100%
   `
 
-const BoxMain = styled.img`
-    @media (max-width: 768px) {
-        margin-right: -20% !important;
-    }
-`;
+  const BoxMain = () => {
+    return (
+      <div>
+        <Image src="/assets/derpfi.png" alt="Your Image" style={{ display: window.innerWidth <= 768 ? 'none' : 'block' }} />
+      </div>
+    );
+  };
 const CHAINID = 137
 // const getApy = async (
 //   pid: string,
@@ -237,13 +255,13 @@ export default function Home() {
                             </h3>
                             <div style={{ margin: '30px 0px' }}>
                                 <a href="#">
-                                    <OutlinedButton>Discover</OutlinedButton>
+                                    <Outline>Discover</Outline>
                                 </a>
                             </div>
                         </div>
                     </LandingCol>
                     <LandingCol xs={24} sm={24} md={12}>
-                        <BoxMain height="100%" width="100%" src="/assets/derpfi.png" />
+                        <BoxMain/>
                     </LandingCol>
                 </LandingRow>
             </RowContainer>
@@ -325,7 +343,7 @@ export default function Home() {
             <RowContainer>
                 <LandingRow>
                     <LandingCol xs={24} sm={24} md={12}>
-                        <SecondaryBox
+                        <Image
                           width={500}
                           height={500}
                           src="/assets/LAPTOP.png"
