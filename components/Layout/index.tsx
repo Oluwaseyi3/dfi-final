@@ -12,9 +12,13 @@ interface RowProps {
     hideOnMobile?: boolean;
 }
 
-export const Row = (props: RowProps) => {
+export const RowCol = (props: any) => {
     return (
-        <Row justify="center" align="middle" style={{ maxWidth: '100%', display: props.hideOnMobile ? 'none' : 'default' }}>
+        <Row
+            justify="center"
+            align="middle"
+            style={{ maxWidth: '100%', display: props.hideOnMobile ? 'none' : 'default' }}
+        >
             {props.children}
         </Row>
     );
@@ -28,9 +32,19 @@ interface ColProps {
     padding?: string;
 }
 
-export const Col = (props: ColProps) => {
+export const ColRow = (props: any) => {
     return (
-        <Col xs={24} sm={24} md={24} style={{ display: props.hideOnMobile ? 'none' : 'default', padding: props.padding ? props.padding : '0px', justifyContent: props.justify ? props.justify : 'center', alignItems: props.align ? props.align : 'center' }}>
+        <Col
+            xs={24}
+            sm={24}
+            md={24}
+            style={{
+                display: props.hideOnMobile ? 'none' : 'default',
+                padding: props.padding ? props.padding : '0px',
+                justifyContent: props.justify ? props.justify : 'center',
+                alignItems: props.align ? props.align : 'center',
+            }}
+        >
             {props.children}
         </Col>
     );
