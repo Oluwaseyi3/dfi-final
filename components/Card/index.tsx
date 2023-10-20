@@ -1,12 +1,15 @@
-import styled from 'styled-components';
+import { Card } from 'antd';
 
-const Card = styled.div`
-    width: 100%;
-    border-radius: 15px;
-    background-color: ${(props) => props.theme.white};
-    box-shadow: 0px 2px 4px #0000004d;
-    margin: 10px 0px;
-    overflow: hidden;
-`;
+interface CardProps {
+    children?: React.ReactNode;
+}
 
-export default Card;
+const CustomCard = (props: CardProps) => {
+    return (
+        <Card style={{ width: '100%', borderRadius: '15px', margin: '10px 0px', overflow: 'hidden' }}>
+            {props.children}
+        </Card>
+    );
+};
+
+export default CustomCard;

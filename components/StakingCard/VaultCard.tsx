@@ -13,7 +13,7 @@ import { fetchPrice } from '../../lib/coingecko';
 import { formatUnits, parseEther } from '@ethersproject/units';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber'
-
+import { Card, Col,Row } from 'antd';
 import { approveMessage, depositMessage, txMessage, withdrawMessage } from '../Messages';
 import { prepareWriteContract, waitForTransaction, writeContract } from '@wagmi/core';
 import { useAccount } from 'wagmi'
@@ -58,12 +58,25 @@ const VaultCardContainer = styled.div`
     transition: box-shadow 0.1s linear;
 `;
 
-const VaultInfoRow = styled(Row)`
-    width: 100%;
-    padding: 10px 20px;
-    min-height: 75px;
-    cursor: pointer;
-`;
+const VaultInfoRow = ({ children , onClick}:any) => {
+    return (
+      <Row
+        style={{
+          width: '100%',
+          padding: '10px 20px',
+          minHeight: '75px',
+          cursor: 'pointer',
+          borderRadius: '15px',
+          backgroundColor: '#fff',
+          boxShadow: '0px 2px 4px #0000004d',
+          margin: '15px 0px',
+        }}
+        onClick={onClick}
+      >
+        <Col>{children}</Col>
+      </Row>
+    );
+  };
 
 const InfoBlock = styled(Col)`
     height: 100%;
@@ -345,7 +358,14 @@ const secNumberValue = BigNumber.from(dfiBalance?.toString() ?? '0'); // Convert
 
   return (
     <div>
-           <VaultCardContainer>
+           <Card
+      className="vault-card"
+      hoverable
+      style={{
+        borderRadius: '15px',
+        boxShadow: '0px 2px 4px #0000004d',
+        margin: '15px 0px',
+      }}>
 
             <VaultInfoRow onClick={() => setExpanded(!expanded)} align="middle" gutter={[0, 10]}>
                 <InfoBlock xs={24} sm={24} md={24} lg={5} style={{ flexGrow: 1 }}>
@@ -525,7 +545,7 @@ const secNumberValue = BigNumber.from(dfiBalance?.toString() ?? '0'); // Convert
                     </Col>
                 </Row>
             </VaultDisplay>
-        </VaultCardContainer>
+        </Card>
     </div>
   )
 }

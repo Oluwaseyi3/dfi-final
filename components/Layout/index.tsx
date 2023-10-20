@@ -1,34 +1,24 @@
-import { Row as ARow, Col as ACol } from 'antd';
-import styled from 'styled-components';
+import { Row, Col } from 'antd';
 
-export const RowContainer = styled.div`
-    width: 100vw;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 100px;
-
-    p {
-        margin-top: 10px;
-    }
-
-    @media (max-width: 768px) {
-        padding: 30px;
-    }
-`;
+export const RowContainer = () => {
+    return (
+        <Row justify="center" align="middle" style={{ width: '100vw', padding: '100px' }}>
+            <p style={{ marginTop: '10px' }}>Content goes here</p>
+        </Row>
+    );
+};
 
 interface RowProps {
     hideOnMobile?: boolean;
 }
 
-export const Row = styled(ARow)<RowProps>`
-    max-width: ${(props) => props.theme.maxWidth};
-    width: 100%;
-    @media (max-width: 768px) {
-        display: ${(props) => (props.hideOnMobile ? 'none' : 'default')};
-    }
-`;
+export const Row = (props: RowProps) => {
+    return (
+        <Row justify="center" align="middle" style={{ maxWidth: '100%', display: props.hideOnMobile ? 'none' : 'default' }}>
+            {props.children}
+        </Row>
+    );
+};
 
 interface ColProps {
     mobilePadding?: string;
@@ -38,17 +28,10 @@ interface ColProps {
     padding?: string;
 }
 
-export const Col = styled(ACol)<ColProps>`
-    display: flex;
-    flex-direction: column;
-    justify-content: ${(props) => (props.justify ? props.justify : 'center')};
-    align-items: ${(props) => (props.align ? props.align : 'center')};
-    padding: ${(props) => (props.padding ? props.padding : '0px')};
-
-    @media (max-width: 768px) {
-        padding: ${(props) => (props.mobilePadding ? props.mobilePadding : '0px')};
-        justify-content: center;
-        align-items: center;
-        display: ${(props) => (props.hideOnMobile ? 'none' : 'default')};
-    }
-`;
+export const Col = (props: ColProps) => {
+    return (
+        <Col xs={24} sm={24} md={24} style={{ display: props.hideOnMobile ? 'none' : 'default', padding: props.padding ? props.padding : '0px', justifyContent: props.justify ? props.justify : 'center', alignItems: props.align ? props.align : 'center' }}>
+            {props.children}
+        </Col>
+    );
+};

@@ -1,7 +1,5 @@
-import { Col, Row, Menu, Layout } from 'antd';
-import styled from 'styled-components';
+import { Card } from 'antd';
 import React from 'react';
-import Image from 'next/image'
 
 interface Props {
     image: string;
@@ -14,120 +12,29 @@ interface Props {
     imgStyle?: React.CSSProperties;
 }
 
-interface CardProps {
-    width?: string;
-}
-
-const Card = styled.div<CardProps>`
-    width: ${(props) => (props.width ? props.width : '100%')};
-    height: 75px;
-    background-color: ${(props) => props.theme.spaceGrey};
-    padding-left: 10px;
-    margin: 10px;
-
-    h1 {
-        font-size: 15px;
-        transition: 0.25s font-size;
-    }
-
-    p {
-        font-size: 12px;
-        margin: 0px !important;
-        transition: 0.25s font-size;
-        color: ${(props) => props.theme.darkGrey};
-    }
-
-    &:hover {
-        h1 {
-            font-size: 17px;
-        }
-
-        p {
-            font-size: 14px;
-        }
-
-        background-color: ${(props) => props.theme.primary};
-        padding-left: 20px;
-        transition: 0.25s padding-left;
-    }
-
-    cursor: pointer;
-
-    border-radius: 15px;
-    box-shadow: 2px 2px 4px #00000012;
-    overflow: hidden;
-    transition: 0.25s padding-left;
-`;
-
-const InternalCard = styled.div`
-    width: 100%;
-    height: 100%;
-    background-color: ${(props) => props.theme.white};
-    border-radius: 15px;
-    padding: 10px 20px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-`;
-
-const ImageContainer = styled.div`
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    box-shadow: 2px 2px 5px #00000012;
-    z-index: 2;
-    background-color: ${(props) => props.theme.white};
-`;
-
-const PrimaryHeader = styled.h1`
-    color: ${(props) => props.theme.primary};
-`;
-
 const RewardCard: React.FC<Props> = (props: Props): React.ReactElement => {
     return (
-        <Card width={props.width} style={props.cardStyle}>
-            <InternalCard>
-                <div style={{ display: 'flex' }}>
-                    <ImageContainer>
-                        <Image src={props.image} width={50}  height={50} style={props.imgStyle} alt="" />
-                    </ImageContainer>
-                    {props.imageSecondary ? (
-                        <ImageContainer style={{ position: 'relative', right: '20px', zIndex: 1 }}>
-                              <Image src={props.imageSecondary} width={50}  height={50} style={props.imgStyle} alt="" />
-                        
-                        </ImageContainer>
-                    ) : (
-                        <></>
-                    )}
-                    <div
-                        style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            paddingLeft: '15px',
-                            marginLeft: props.imageSecondary ? '-20px' : '0px',
-                            marginTop: '7px',
-                        }}
-                    >
-                        <h1>{props.name}</h1>
-                        <p>{props.ticker}</p>
+        <Card style={{ width: props.width ? props.width : '100%', borderRadius: '15px', margin: '10px', overflow: 'hidden', backgroundColor: '#1f1f1f' }} bodyStyle={{ padding: '10px 20px', backgroundColor: '#ffffff', borderRadius: '15px' }}>
+            <div style={{ display: 'flex' }}>
+                <div style={{ width: '50px', height: '50px', borderRadius: '50%', boxShadow: '2px 2px 5px #00000012', zIndex: 2, backgroundColor: '#ffffff' }}>
+                    <img src={props.image} width={50} height={50} style={props.imgStyle} alt="" />
+                </div>
+                {props.imageSecondary ? (
+                    <div style={{ width: '50px', height: '50px', borderRadius: '50%', boxShadow: '2px 2px 5px #00000012', zIndex: 1, position: 'relative', right: '20px' }}>
+                        <img src={props.imageSecondary} width={50} height={50} style={props.imgStyle} alt="" />
                     </div>
+                ) : (
+                    <></>
+                )}
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingLeft: '15px', marginLeft: props.imageSecondary ? '-20px' : '0px', marginTop: '7px' }}>
+                    <h1 style={{ fontSize: '15px', margin: '0px', transition: '0.25s font-size', color: '#000000' }}>{props.name}</h1>
+                    <p style={{ fontSize: '12px', margin: '0px !important', transition: '0.25s font-size', color: '#8c8c8c' }}>{props.ticker}</p>
                 </div>
-                <div
-                    style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'center',
-                        alignItems: 'flex-end',
-                        paddingLeft: '15px',
-                        marginTop: '7px',
-                    }}
-                >
-                    <PrimaryHeader>{props.apy}</PrimaryHeader>
-                    <p>APY</p>
+                <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end', paddingLeft: '15px', marginTop: '7px' }}>
+                    <h1 style={{ color: '#1890ff', margin: '0px', fontSize: '20px', fontWeight: 'bold' }}>{props.apy}</h1>
+                    <p style={{ fontSize: '12px', margin: '0px !important', color: '#8c8c8c' }}>APY</p>
                 </div>
-            </InternalCard>
+            </div>
         </Card>
     );
 };
