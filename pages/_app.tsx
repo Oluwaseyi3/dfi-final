@@ -9,7 +9,7 @@ import { WagmiConfig, createConfig, configureChains, mainnet } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import { polygon } from 'wagmi/chains';
 import 'antd/dist/antd.css';
-import { Component } from 'next/app';
+import Component from 'next/app';
 
 function getLibrary(provider: ExternalProvider | JsonRpcFetchFunc) {
     return new Web3Provider(provider);
