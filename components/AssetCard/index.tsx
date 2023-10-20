@@ -1,7 +1,7 @@
 import { Asset } from '../../lib/asset';
 import React from 'react';
-import { Col, Row } from '../Layout';
-import Card from '../Card';
+import { Col, Row , Card} from '../Layout';
+
 import styled from 'styled-components';
 import { BigNumber } from '@ethersproject/bignumber';
 import { parseBalance } from '../../util';
