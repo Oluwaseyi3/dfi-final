@@ -1,29 +1,34 @@
 import { Button } from 'antd';
-import styled from 'styled-components';
 
 interface Props {
-    disabled?: boolean;
-    selected?: boolean;
+  children: string;
+  disabled?: boolean;
+  selected?: boolean;
 }
 
-export default styled(Button)<Props>`
-    background: ${(props) =>
-        props.disabled
-            ? props.theme.spaceGrey
-            : props.selected
-            ? props.theme.primary + ' 0% 0% no-repeat padding-box'
-            : props.theme.white + ' 0% 0% no-repeat padding-box'};
-    border: ${(props) => '2px solid ' + (props.disabled ? props.theme.grey : props.theme.primary)} !important;
-    border-radius: 10px;
-    color: ${(props) =>
-        props.selected ? props.theme.white : props.disabled ? props.theme.grey : props.theme.primary} !important;
-    padding: 10px 35px 10px 35px;
-    text-align: center;
-    height: 45px;
-    font-weight: normal;
+const Outline = ({ children, disabled, selected }: Props) => {
+  return (
+    <Button
+      type="default"
+      disabled={disabled}
+      style={{
+        background: disabled
+          ? '#f5f5f5'
+          : selected
+          ? '#1890ff'
+          : '#fff',
+        border: `2px solid ${disabled ? '#d9d9d9' : '#1890ff'}`,
+        borderRadius: '10px',
+        color: selected ? '#fff' : disabled ? '#a6a6a6' : '#1890ff',
+        padding: '10px 35px 10px 35px',
+        textAlign: 'center',
+        height: '45px',
+        fontWeight: 'normal',
+      }}
+    >
+      {children}
+    </Button>
+  );
+};
 
-    &:hover {
-        background: ${(props) => (props.disabled ? 'default' : props.theme.primary + ' 0% 0% no-repeat padding-box')};
-        color: ${(props) => (props.disabled ? 'default' : props.theme.white)} !important;
-    }
-`;
+export default Outline;
