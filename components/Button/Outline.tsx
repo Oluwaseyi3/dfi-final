@@ -4,9 +4,10 @@ interface Props {
   children: string;
   disabled?: boolean;
   selected?: boolean;
+  onClick: () => void; 
 }
 
-const Outline = ({ children, disabled, selected }: Props) => {
+const Outline = ({ children, disabled, selected, onClick }: Props) => {
   return (
     <Button
       type="default"
@@ -25,6 +26,7 @@ const Outline = ({ children, disabled, selected }: Props) => {
         height: '45px',
         fontWeight: 'normal',
       }}
+      onClick={onClick}
     >
       {children}
     </Button>
