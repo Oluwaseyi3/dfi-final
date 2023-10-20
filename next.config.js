@@ -6,4 +6,7 @@ module.exports = withAntdLess({
     webpack(config) {
         return config;
     },
+    experimental: {
+        appDir: false,
+    },
 });
