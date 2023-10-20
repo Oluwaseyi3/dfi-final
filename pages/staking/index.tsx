@@ -1,191 +1,233 @@
-import React from 'react'
-import { Layout, Row, Col } from 'antd';
+import React from 'react';
+import { Layout, Row, Col , Card, Typography} from 'antd';
 import styled from 'styled-components';
-import { useBalance } from 'wagmi'
-import { useAccount } from 'wagmi'
+import { useBalance } from 'wagmi';
+import { useAccount } from 'wagmi';
 import VaultCard from '../../components/StakingCard/VaultCard';
+import Image from 'next/image';
 
-const RowContainer = styled.div`
-    width: 100vw;
+const RowContainer = ({ children }: any) => {
+    return (
+        <Row justify="center" align="middle" style={{ width: '100vw', padding: '100px' }}>
+            <p style={{ marginTop: '10px' }}>{children}</p>
+        </Row>
+    );
+};
 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 100px;
+const StakingRow = ({ children }:any) => {
+    const rowStyle = {
+        maxWidth: '1500px', // Set your desired max-width
+        width: '100%',
+    };
 
-    p {
-        margin-top: 10px;
-    }
+    return <Row style={rowStyle}>{children}</Row>;
+};
 
-    @media (max-width: 768px) {
-        padding: 30px;
-    }
-`;
+const StakingCol = ({ children }: any) => {
+    const colStyle = {
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+    };
 
-const StakingRow = styled(Row)`
-    max-width: ${(props) => props.theme.maxWidth};
-    width: 100%;
-`;
+    return <Col>{children}</Col>;
+};
+const BoxImage = () => {
+    const imageStyle = {
+        marginRight: '-20%',
+        display: 'none',
+    };
 
-const StakingCol = styled(Col)`
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+    return (
+        <Image
+        src="/assets/LAPTOP.png"
+            alt="Image Alt Text"
+            width={100}
+            height={100}
+            style={imageStyle}
+        />
+    );
+};
+const { Title } = Typography;
 
-    @media (max-width: 768px) {
-        padding-top: 50px;
-    }
-`;
+const RewardsContainer = ({children}:any) => {
+  return (
+    <Row justify="center" align="middle" style={{ width: '100%', maxWidth: '450px' }}>
+      <Col span={24} style={{ display: 'flex', flexDirection: 'column' }}>
+        <Title level={4} style={{ fontSize: '30px' }}>
+         {children}
+        </Title>
+      </Col>
+    </Row>
+  );
+};
+const { Paragraph } = Typography;
 
-const BoxImage = styled.img`
-    @media (max-width: 768px) {
-        margin-right: -20% !important;
-        display: none;
-    }
-`;
-
-const RewardsContainer = styled.div`
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    max-width: 450px;
-
-    h1 {
-        font-size: 30px;
-    }
-`;
-
-const RewardCard = styled.div`
-    height: 75px;
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    box-shadow: 0px 1px 8px #29292921;
-    background-color: ${(props) => props.theme.white};
-    z-index: 2;
-    border-radius: 15px;
-    overflow: hidden;
-    margin: 10px 0px;
-
-    p {
-        margin: 0px 15px 0px 0px;
-        font-size: 17px;
-        font-family: 'Visuelt';
-    }
-`;
-
-const RewardRow = styled.div`
-    display: flex;
-    align-items: center;
-
-    p {
-        margin: 0px 0px 0px 25px;
-        font-family: 'Visuelt';
-    }
-`;
+  const RewardRow = ({children}:any) => {
+    return (
+      <Row align="middle">
+        <Paragraph style={{ margin: '0px 0px 0px 25px', fontFamily: 'Visuelt' }}>
+          {children}
+        </Paragraph>
+      </Row>
+    );
+  };
 
 interface ClaimButtonProps {
     enabled?: boolean;
 }
 
-const ClaimButton = styled.div<ClaimButtonProps>`
-    cursor: pointer;
-    width: 100%;
-    padding: 35px 0px 5px 0px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: ${(props) => (props.enabled ? props.theme.white : 'default')};
-    background-color: ${(props) => (props.enabled ? props.theme.primary : props.theme.white)};
-    z-index: 1;
-    margin-top: -23px;
-    border-radius: 15px;
+const ClaimButton = ({ enabled, theme, children }:any) => {
+    return (
+      <Row
+        style={{
+          cursor: 'pointer',
+          width: '100%',
+          padding: '35px 0px 5px 0px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          color: enabled ? theme.white : 'default',
+          backgroundColor: enabled ? theme.primary : theme.white,
+          zIndex: 1,
+          marginTop: '-23px',
+          borderRadius: '15px',
+          transition: 'background-color 100ms linear',
+        }}
+        onMouseEnter={() => {
+          if (enabled) {
+            theme.primaryDark = theme.primaryDark || '#d15e43'; // Replace with the desired color
+          }
+        }}
+        onMouseLeave={() => {
+          if (enabled) {
+            theme.primaryDark = theme.primary; // Reset to the original color
+          }
+        }}
+      >
+        <Paragraph
+          style={{
+            margin: '0px',
+            fontWeight: 'bold',
+            fontSize: '17px',
+            fontFamily: 'Visuelt',
+          }}
+        >
+          {children}
+        </Paragraph>
+      </Row>
+    );
+  };
+  
+  
+//   const { Title } = Typography;
 
-    &:hover {
-        background-color: ${(props) => (props.enabled ? props.theme.primaryDark : props.theme.white)};
-    }
+  const StakingContainer = ({children}:any) => {
+    return (
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        <Title level={4} style={{ fontSize: '30px' }}>
+       
+        </Title>
+        {children}
+      </div>
+    );
+  };
 
-    p {
-        margin: 0px;
-        font-weight: bold;
-        font-size: 17px;
-        font-family: 'Visuelt';
-    }
+  const { Text } = Typography;
 
-    transition: background-color 100ms linear;
-`;
-
-const StakingContainer = styled.div`
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-
-    h1 {
-        font-size: 30px;
-    }
-`;
+const RewardCard = ({children}:any) => {
+    return (
+      <Card
+        style={{
+          height: '75px',
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          boxShadow: '0px 1px 8px #29292921',
+          backgroundColor: 'white', // You can replace this with your theme variable
+          zIndex: 2,
+          borderRadius: '15px',
+          overflow: 'hidden',
+          margin: '10px 0px',
+        }}
+      >
+        <Text
+          style={{
+            margin: '0px 15px 0px 0px',
+            fontSize: '17px',
+            fontFamily: 'Visuelt', // You can add your custom font here
+          }}
+        >
+        </Text>
+        {children}
+      </Card>
+    );
+  };
+  
 
 const Landing = () => {
+    const { address } = useAccount();
 
-    const { address} = useAccount()
-
-    const { data: derphiBalance} = useBalance({
+    const { data: derphiBalance } = useBalance({
         address: address,
         token: '0x4987131473ccC84FEdbf22Ab383b6188D206cc9C',
-        
-      })
+    });
 
-     
-     
-  return (
-    <div>
-           <Layout.Content>
-            <RowContainer>
-                <StakingRow>
-                    <StakingCol md={12}>
-                        <BoxImage height="80%" width="80%" src="/assets/LAPTOP.png" />
-                    </StakingCol>
-                    <StakingCol xs={24} sm={24} md={12}>
-                        <RewardsContainer>
-                            <h1>Rewards</h1>
-                            <RewardCard>
-                                <RewardRow>
-                                    <img height="100%" src="/assets/wallet.png" />
-                                    <p>
-                                        Derpfi <br /> Balance
-                                    </p>
-                                </RewardRow>
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                             
-                                    <p>{`${derphiBalance ? Number(derphiBalance?.formatted).toFixed(2): 0.0 }DFI`}</p>
-                                 
-                                </div>
-                            </RewardCard>
-                            <RewardCard>
-                                <RewardRow>
-                                    <img height="100%" src="/assets/lock-closed.png" />
-                                    <p>
-                                        Locked <br /> Rewards
-                                    </p>
-                                </RewardRow>
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    {/* <p>{`${!!lockedBalance ? lockedBalance : '0.0'} DFI`}</p> */}
-                                </div>
-                            </RewardCard>
-                            <RewardCard style={{ marginBottom: '0px' }}>
-                                <RewardRow>
-                                    <img height="100%" src="/assets/lock-open.png" />
-                                    <p>
-                                        Unlocked <br /> Rewards
-                                    </p>
-                                </RewardRow>
-                                <div style={{ display: 'flex', alignItems: 'center' }}>
-                                    {/* <p>{`${!!unlockedBalance ? unlockedBalance : '0.0'} DFI`}</p> */}
-                                </div>
-                            </RewardCard>
-                            <ClaimButton
+    return (
+        <div>
+            <Layout.Content>
+                <RowContainer>
+                    <StakingRow>
+                        <StakingCol md={12}>
+                            <BoxImage />
+                        </StakingCol>
+                        <StakingCol xs={24} sm={24} md={12}>
+                            <RewardsContainer>
+                                <h1>Rewards</h1>
+                                <RewardCard>
+                                    <RewardRow>
+                                        <img height="100%" src="/assets/wallet.png" />
+                                        <p>
+                                            Derpfi <br /> Balance
+                                        </p>
+                                    </RewardRow>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        <p>{`${
+                                            derphiBalance ? Number(derphiBalance?.formatted).toFixed(2) : 0.0
+                                        }DFI`}</p>
+                                    </div>
+                                </RewardCard>
+                                <RewardCard>
+                                    <RewardRow>
+                                        <img height="100%" src="/assets/lock-closed.png" />
+                                        <p>
+                                            Locked <br /> Rewards
+                                        </p>
+                                    </RewardRow>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        {/* <p>{`${!!lockedBalance ? lockedBalance : '0.0'} DFI`}</p> */}
+                                    </div>
+                                </RewardCard>
+                                <RewardCard style={{ marginBottom: '0px' }}>
+                                    <RewardRow>
+                                        <img height="100%" src="/assets/lock-open.png" />
+                                        <p>
+                                            Unlocked <br /> Rewards
+                                        </p>
+                                    </RewardRow>
+                                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                                        {/* <p>{`${!!unlockedBalance ? unlockedBalance : '0.0'} DFI`}</p> */}
+                                    </div>
+                                </RewardCard>
+                                <ClaimButton
                                 // enabled={unlockedBalance > 0}
                                 // onClick={() => {
                                 //     if (unlockedBalance > 0) {
@@ -203,29 +245,29 @@ const Landing = () => {
                                 //             });
                                 //     }
                                 // }}
-                            >
-                                <p>Claim</p>
-                            </ClaimButton>
-                        </RewardsContainer>
-                    </StakingCol>
-                </StakingRow>
-            </RowContainer>
-            <RowContainer style={{ paddingTop: '50px' }}>
-                <StakingRow>
-                    <StakingCol span={24}>
-                        <StakingContainer>
-                            <h1>Available Staking Options</h1>
-                            <VaultCard
-                                image="/assets/derpfi.png"
-                                name="DFI Vault"
-                                imageStyle={{ marginTop: '3px', marginLeft: '2px', zIndex: 2 }}
-                                pid="0"
-                                // vault={getNamedAddress(chainId, 'BundleVault')!}
-                                disabled={false}
-                                // account={account!}
-                                balance={derphiBalance}
-                            />
-                            {/* <StakingCard
+                                >
+                                    <p>Claim</p>
+                                </ClaimButton>
+                            </RewardsContainer>
+                        </StakingCol>
+                    </StakingRow>
+                </RowContainer>
+                <RowContainer style={{ paddingTop: '50px' }}>
+                    <StakingRow>
+                        <StakingCol span={24}>
+                            <StakingContainer>
+                                <h1>Available Staking Options</h1>
+                                <VaultCard
+                                    image="/assets/derpfi.png"
+                                    name="DFI Vault"
+                                    imageStyle={{ marginTop: '3px', marginLeft: '2px', zIndex: 2 }}
+                                    pid="0"
+                                    // vault={getNamedAddress(chainId, 'BundleVault')!}
+                                    disabled={false}
+                                    // account={account!}
+                                    balance={derphiBalance}
+                                />
+                                {/* <StakingCard
                                 image="/assets/derpfi.png"
                                 imageSecondary="/assets/BNB.png"
                                 name="DFI-BNB"
@@ -273,13 +315,13 @@ const Landing = () => {
                                 tokenA="0x934C7F600d6eE2fb60CdFf61d1b9fC82C6b8C011" //bStable (bSTBL)
                                 tokenB="0xe9e7cea3dedca5984780bafc599bd69add087d56" //Binance-Peg BUSD Token (BUSD) (@$1.0001)
                             /> */}
-                        </StakingContainer>
-                    </StakingCol>
-                </StakingRow>
-            </RowContainer>
-        </Layout.Content>
-    </div>
-  )
-}
+                            </StakingContainer>
+                        </StakingCol>
+                    </StakingRow>
+                </RowContainer>
+            </Layout.Content>
+        </div>
+    );
+};
 
-export default Landing
+export default Landing;
