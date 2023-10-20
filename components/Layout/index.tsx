@@ -1,9 +1,9 @@
 import { Row, Col } from 'antd';
 
-export const RowContainer = () => {
+export const RowContainer = ({ children }: any) => {
     return (
         <Row justify="center" align="middle" style={{ width: '100vw', padding: '100px' }}>
-            <p style={{ marginTop: '10px' }}>Content goes here</p>
+            <p style={{ marginTop: '10px' }}>{children}</p>
         </Row>
     );
 };

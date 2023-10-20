@@ -1,18 +1,17 @@
-import { Layout } from 'antd';
+import { Layout, Row, Col } from 'antd';
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { RowContainer, Row, Col } from '../../components/Layout';
+import { RowContainer, RowCol, ColRow } from '../../components/Layout';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
-import Card from '../../components/Card';
+import CustomCard from '../../components/Card';
 import AssetCard from '../../components/AssetCard';
 import { BigNumber } from '@ethersproject/bignumber';
 import { Asset, getAsset, SWAP_ASSETS } from '../../lib/asset';
 import { parseBalance } from '../../util';
 import { parseEther } from '@ethersproject/units';
 import { getAssets, getFundByName, Fund } from '../../lib/fund';
-
 
 interface SelectorProps {
     selected: boolean;
@@ -53,7 +52,6 @@ const Selector = styled.div<SelectorProps>`
 const TRADE = 'TRADE';
 const MINT = 'MINT';
 const BURN = 'BURN';
-
 
 const Landing: React.FC = (): React.ReactElement => {
     // const { library, account } = useWeb3React();
@@ -99,107 +97,109 @@ const Landing: React.FC = (): React.ReactElement => {
                 return 0;
             }
         })
-        .map((asset, index) => <AssetCard asset={asset} nav={nav} index={index} key={index}/>);
+        .map((asset, index) => <AssetCard asset={asset} nav={nav} index={index} key={index} />);
 
-        return (
-            <Layout.Content>
-                <RowContainer style={{ flexDirection: 'column' }}>
-                    <Row style={{ paddingBottom: '15px' }}>
-                        <Col xs={4} md={2} hideOnMobile={true}>
-                            <Link href="/funds">
-                                <ArrowLeftOutlined style={{ fontSize: '25px' }} />
-                            </Link>
-                        </Col>
-                        <Col xs={{ span: 22, push: 1 }} md={{ span: 9, push: 0 }} style={{ alignItems: 'flex-start' }}>
-                            <h2 style={{ marginBottom: '0px' }}>
-                                {fund ? fund.name : '...'}
-                                <a
-                                    href={`https://bscscan.com/address/${fund ? fund.address : ''}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
+    return (
+        <Layout.Content>
+            <RowContainer style={{ flexDirection: 'column' }}>
+                <RowCol style={{ paddingBottom: '15px' }}>
+                    <ColRow xs={4} md={2} hideOnMobile={true}>
+                        <Link href="/funds">
+                            <ArrowLeftOutlined style={{ fontSize: '25px' }} />
+                        </Link>
+                    </ColRow>
+                    <ColRow xs={{ span: 22, push: 1 }} md={{ span: 9, push: 0 }} style={{ alignItems: 'flex-start' }}>
+                        <h2 style={{ marginBottom: '0px' }}>
+                            {fund ? fund.name : '...'}
+                            <a
+                                href={`https://bscscan.com/address/${fund ? fund.address : ''}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    fontWeight: 100,
+                                    fontSize: '13px',
+                                    paddingLeft: '5px',
+                                    color: 'rgba(0, 0, 0, 0.85)',
+                                }}
+                            >
+                                {fund ? '- ' + fund.address : '...'}
+                            </a>
+                        </h2>
+                        <span style={{ marginBottom: '0px' }}>{fund ? fund.description : '...'}</span>
+                    </ColRow>
+                    <ColRow xs={12} md={3} style={{ justifyContent: 'flex-end' }} mobilePadding="15px 0px 0px 0px">
+                        <Field>Price</Field>
+                        <Text>{`$${fundAsset ? parseBalance(fundAsset.price!, 18, 2, false) : '0.00'}`}</Text>
+                    </ColRow>
+                    <ColRow xs={12} md={3} style={{ justifyContent: 'flex-end' }} mobilePadding="15px 0px 0px 0px">
+                        <Field>24H</Field>
+                        <Text>N/A</Text>
+                    </ColRow>
+                    <ColRow xs={12} md={4} style={{ justifyContent: 'flex-end' }} mobilePadding="15px 0px 0px 0px">
+                        <Field>Market Cap</Field>
+                        <Text>
+                            {`$${
+                                fundAsset
+                                    ? parseBalance(
+                                          fundAsset.price!.mul(fundAsset.cap!).div(parseEther('1')),
+                                          18,
+                                          2,
+                                          false
+                                      )
+                                    : '0.00'
+                            }`}
+                        </Text>
+                    </ColRow>
+                    <ColRow xs={12} md={3} style={{ justifyContent: 'flex-end' }} mobilePadding="15px 0px 0px 0px">
+                        <Field>NAV</Field>
+                        <Text>
+                            {fundAsset
+                                ? `$${parseBalance(nav.mul(parseEther('1')).div(fundAsset.cap!), 18, 2, false)}`
+                                : '0.00'}
+                        </Text>
+                    </ColRow>
+                </RowCol>
+                <RowCol gutter={15}>
+                    <ColRow
+                        xs={{ order: 2, span: 24 }}
+                        lg={{ order: 1, span: 16 }}
+                        style={{ justifyContent: 'flex-start' }}
+                    >
+                        <RowCol>
+                            <ColRow span={24} padding="0px" mobilePadding="0px">
+                                <div
                                     style={{
-                                        fontWeight: 100,
-                                        fontSize: '13px',
-                                        paddingLeft: '5px',
-                                        color: 'rgba(0, 0, 0, 0.85)',
+                                        height: '500px',
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        justifyContent: 'center',
+                                        alignItems: 'center',
+                                        padding: '20px',
                                     }}
                                 >
-                                    {fund ? '- ' + fund.address : '...'}
-                                </a>
-                            </h2>
-                            <span style={{ marginBottom: '0px' }}>{fund ? fund.description : '...'}</span>
-                        </Col>
-                        <Col xs={12} md={3} style={{ justifyContent: 'flex-end' }} mobilePadding="15px 0px 0px 0px">
-                            <Field>Price</Field>
-                            <Text>{`$${fundAsset ? parseBalance(fundAsset.price!, 18, 2, false) : '0.00'}`}</Text>
-                        </Col>
-                        <Col xs={12} md={3} style={{ justifyContent: 'flex-end' }} mobilePadding="15px 0px 0px 0px">
-                            <Field>24H</Field>
-                            <Text>N/A</Text>
-                        </Col>
-                        <Col xs={12} md={4} style={{ justifyContent: 'flex-end' }} mobilePadding="15px 0px 0px 0px">
-                            <Field>Market Cap</Field>
-                            <Text>
-                                {`$${
-                                    fundAsset
-                                        ? parseBalance(
-                                              fundAsset.price!.mul(fundAsset.cap!).div(parseEther('1')),
-                                              18,
-                                              2,
-                                              false
-                                          )
-                                        : '0.00'
-                                }`}
-                            </Text>
-                        </Col>
-                        <Col xs={12} md={3} style={{ justifyContent: 'flex-end' }} mobilePadding="15px 0px 0px 0px">
-                            <Field>NAV</Field>
-                            <Text>
-                                {fundAsset
-                                    ? `$${parseBalance(nav.mul(parseEther('1')).div(fundAsset.cap!), 18, 2, false)}`
-                                    : '0.00'}
-                            </Text>
-                        </Col>
-                    </Row>
-                    <Row gutter={15}>
-                        <Col
-                            xs={{ order: 2, span: 24 }}
-                            lg={{ order: 1, span: 16 }}
-                            style={{ justifyContent: 'flex-start' }}
-                        >
-                            <Row>
-                                <Col span={24} padding="0px" mobilePadding="0px">
-                                    <Card
-                                        style={{
-                                            height: '500px',
-                                            display: 'flex',
-                                            flexDirection: 'column',
-                                            justifyContent: 'center',
-                                            alignItems: 'center',
-                                            padding: '20px',
-                                        }}
-                                    >
-                                        {/* <Chart id={fund?.cgid} /> */}
-                                    </Card>
-                                </Col>
-                            </Row>
-                            <Row justify="space-between">{assetCards}</Row>
-                        </Col>
-                        <Col
-                            xs={{ order: 1, span: 24 }}
-                            lg={{ order: 2, span: 8 }}
-                            style={{ justifyContent: 'flex-start' }}
-                        >
-                            <Row>
-                                <Col span={24} style={{ width: '100%' }}>
-                                    <Card
-                                        style={{
-                                            height: '60px',
-                                            display: 'flex',
-                                            justifyContent: 'space-evenly',
-                                            alignItems: 'flex-end',
-                                        }}
-                                    >
+                                    <CustomCard>{/* <Chart id={fund?.cgid} /> */}</CustomCard>
+                                </div>
+                            </ColRow>
+                        </RowCol>
+                        <RowCol justify="space-between">{assetCards}</RowCol>
+                    </ColRow>
+
+                    <ColRow
+                        xs={{ order: 1, span: 24 }}
+                        lg={{ order: 2, span: 8 }}
+                        style={{ justifyContent: 'flex-start' }}
+                    >
+                        <RowCol>
+                            <ColRow span={24} style={{ width: '100%' }}>
+                                <div
+                                    style={{
+                                        height: '60px',
+                                        display: 'flex',
+                                        justifyContent: 'space-evenly',
+                                        alignItems: 'flex-end',
+                                    }}
+                                >
+                                    <CustomCard>
                                         <Selector onClick={selectorOnClick(TRADE)} selected={selected == TRADE}>
                                             Swap
                                         </Selector>
@@ -209,9 +209,10 @@ const Landing: React.FC = (): React.ReactElement => {
                                         <Selector onClick={selectorOnClick(BURN)} selected={selected == BURN}>
                                             Redeem
                                         </Selector>
-                                    </Card>
-                                </Col>
-                                {/* {selected == TRADE ? (
+                                    </CustomCard>
+                                </div>
+                            </ColRow>
+                            {/* {selected == TRADE ? (
                                     <Swap
                                         fund={fund}
                                         assets={SWAP_ASSETS}
@@ -227,13 +228,12 @@ const Landing: React.FC = (): React.ReactElement => {
                                         fundAsset={fundAsset}
                                     />
                                 )} */}
-                            </Row>
-                        </Col>
-                    </Row>
-                </RowContainer>
-            </Layout.Content>
-        );
-    };
-    
-    export default Landing;
-    
+                        </RowCol>
+                    </ColRow>
+                </RowCol>
+            </RowContainer>
+        </Layout.Content>
+    );
+};
+
+export default Landing;
