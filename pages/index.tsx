@@ -1,10 +1,10 @@
-import * as React from 'react';
+import React,{useState, useEffect} from 'react';
 import Head from 'next/head'
 import Image from 'next/image'
 
 import { Layout, Row, Col,  } from 'antd';
 import styled from 'styled-components';
-import  { useState } from 'react';
+
 import Outline from '../components/Button/Outline';
 import RewardCard from '../components/RewardCard';
 import { formatNumber, getNamedAddress } from '../util';
@@ -99,13 +99,37 @@ const BoxHeader = styled.div`
   width: 100%
   `
 
-  const BoxMain = () => {
+ 
+const BoxMain = () => {
+    const [displayStyle, setDisplayStyle] = useState('block');
+  
+    useEffect(() => {
+      // Check the window width and update the display style
+      const handleResize = () => {
+        if (window.innerWidth <= 768) {
+          setDisplayStyle('none');
+        } else {
+          setDisplayStyle('block');
+        }
+      };
+  
+      // Attach the event listener and set the initial display style
+      handleResize();
+      window.addEventListener('resize', handleResize);
+  
+      // Clean up the event listener when the component unmounts
+      return () => {
+        window.removeEventListener('resize', handleResize);
+      };
+    }, []); // The empty dependency array ensures the effect runs once after the initial render
+  
     return (
       <div>
-        <Image src="/assets/derpfi.png" alt="Your Image" style={{ display: window.innerWidth <= 768 ? 'none' : 'block' }} />
+        <Image src="/assets/derpfi.png" alt="Your Image"  width={100} height={100} />
       </div>
     );
   };
+  
 const CHAINID = 137
 // const getApy = async (
 //   pid: string,
