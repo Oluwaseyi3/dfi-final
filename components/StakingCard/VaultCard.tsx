@@ -14,7 +14,6 @@ import { formatUnits, parseEther } from '@ethersproject/units';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
 
-import 'react-toastify/dist/ReactToastify.css';
 import { approveMessage, depositMessage, txMessage, withdrawMessage } from '../Messages';
 import { prepareWriteContract, waitForTransaction, writeContract } from '@wagmi/core';
 import { useAccount } from 'wagmi';
