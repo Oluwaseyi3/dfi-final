@@ -46,7 +46,7 @@ const FundCard: React.FC<Props> = (props: Props): React.ReactElement => {
               {props.fund.name}
             </div>
           </Col>
-          <Col xs={24} md={9} style={{ justifyContent: 'center', flexDirection: 'row' }} hidden={{ md: true }}>
+          <Col xs={24} md={9} style={{ justifyContent: 'center', flexDirection: 'row' }} hidden={true}>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>{assets}</div>
           </Col>
           <Col xs={8} md={3}>
