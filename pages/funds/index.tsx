@@ -3,11 +3,10 @@ import { Layout } from 'antd';
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import FundCard from '../../components/FundCard';
-import { RowContainer, Row, Col } from '../../components/Layout';
+import { RowContainer, RowCol, ColRow } from '../../components/Layout';
 import { Asset, getAsset } from '../../lib/asset';
 import { Fund, getFundByName } from '../../lib/fund';
 import { parseBalance } from '../../util';
-
 
 const FundContainer = styled.div`
     width: 100%;
@@ -25,8 +24,6 @@ const Field = styled.span`
 const FUNDS = ['dDEFI', 'dCHAIN', 'dSTBL'];
 
 const Landing: React.FC = (): React.ReactElement => {
-    
-
     const funds: Fund[] = [];
     const [fundAssets, setFundAssets] = useState<{ [key: string]: Asset }>({});
 
@@ -54,8 +51,8 @@ const Landing: React.FC = (): React.ReactElement => {
 
             setFundAssets(newFundAssets);
         });
-    // }, [library]);
-}, []);
+        // }, [library]);
+    }, []);
 
     const fundCards: React.ReactElement[] = [];
     funds.forEach((fund, index) => {
@@ -82,34 +79,34 @@ const Landing: React.FC = (): React.ReactElement => {
     return (
         <Layout.Content>
             <RowContainer style={{ flexDirection: 'column' }}>
-                <Row>
-                    <Col span={24} style={{ alignItems: 'flex-start' }}>
+                <RowCol>
+                    <ColRow span={24} style={{ alignItems: 'flex-start' }}>
                         <h2 style={{ marginBottom: '0px' }}>Available Bundles</h2>
                         <span style={{ marginBottom: '30px' }}>Passively managed, non-custodial crypto-funds.</span>
-                    </Col>
-                </Row>
-                <Row hideOnMobile={true}>
-                    <Col xs={5} md={5} style={{ alignItems: 'flex-start' }}>
+                    </ColRow>
+                </RowCol>
+                <RowCol hideOnMobile={true}>
+                    <ColRow xs={5} md={5} style={{ alignItems: 'flex-start' }}>
                         <Field style={{ paddingLeft: '10px' }}>Name</Field>
-                    </Col>
-                    <Col xs={9} md={9}>
+                    </ColRow>
+                    <ColRow xs={9} md={9}>
                         <Field>Assets</Field>
-                    </Col>
-                    <Col xs={3} md={3}>
+                    </ColRow>
+                    <ColRow xs={3} md={3}>
                         <Field>24H</Field>
-                    </Col>
-                    <Col xs={4} md={4}>
+                    </ColRow>
+                    <ColRow xs={4} md={4}>
                         <Field>Market Cap</Field>
-                    </Col>
-                    <Col xs={3} md={3}>
+                    </ColRow>
+                    <ColRow xs={3} md={3}>
                         <Field>Price</Field>
-                    </Col>
-                </Row>
-                <Row>
-                    <Col span={24} mobilePadding="0px">
+                    </ColRow>
+                </RowCol>
+                <RowCol>
+                    <ColRow span={24} mobilePadding="0px">
                         <FundContainer>{fundCards}</FundContainer>
-                    </Col>
-                </Row>
+                    </ColRow>
+                </RowCol>
             </RowContainer>
         </Layout.Content>
     );
