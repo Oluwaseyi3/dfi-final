@@ -1,4 +1,3 @@
-
 import { Button } from 'antd';
 import styled from 'styled-components';
 
@@ -6,6 +5,7 @@ interface Props {
   disabled?: boolean;
 }
 
+// Define a custom button component that wraps the Ant Design Button
 const FilledButton = styled(Button)<Props>`
   background: ${(props) => props.disabled ? props.theme.spaceGrey : props.theme.primary + ' 0% 0% no-repeat padding-box'};
   border: ${(props) => '2px solid ' + (props.disabled ? props.theme.grey : props.theme.primary)} !important;
@@ -18,4 +18,5 @@ const FilledButton = styled(Button)<Props>`
   width: 100%;
 `;
 
+// Export the styled custom button
 export default FilledButton;

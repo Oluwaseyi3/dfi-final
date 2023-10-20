@@ -137,7 +137,7 @@ const Navbar: React.FC = (): React.ReactElement => {
                             <Menu.ItemGroup title="Bundle">
                                 <Menu.Item key="bdl">
                                     <Link href="https://exchange.pancakeswap.finance/#/swap?outputCurrency=0x7ff78e1cab9a2710eb6486ecbf3d94d125039364">
-                                      Buy BDL
+                                      Buy Derphi
                                     </Link>
                                 </Menu.Item>
                             </Menu.ItemGroup>
