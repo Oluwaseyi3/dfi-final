@@ -1,23 +1,22 @@
-import React from 'react'
+import React from 'react';
 import Divider from 'antd/lib/divider';
-import { useEffect, useState , useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { formatNumber, getNamedAddress, parseBalance } from '../../util';
 import BundleTokenABI from '../../contracts/BundleToken.json';
 import VaultABI from '../../contracts/Vault.json';
-import Image from 'next/image'
+import Image from 'next/image';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
 import { Col, Row, InputNumber } from 'antd';
-import OutlinedButton from '../Button/Outline';
+import Outline from '../Button/Outline';
 import { fetchPrice } from '../../lib/coingecko';
 import { formatUnits, parseEther } from '@ethersproject/units';
 import { Contract } from '@ethersproject/contracts';
-import { BigNumber } from '@ethersproject/bignumber'
-import { Card, Col,Row } from 'antd';
+import { BigNumber } from '@ethersproject/bignumber';
 import { approveMessage, depositMessage, txMessage, withdrawMessage } from '../Messages';
 import { prepareWriteContract, waitForTransaction, writeContract } from '@wagmi/core';
-import { useAccount } from 'wagmi'
-import { useContractRead } from 'wagmi'
+import { useAccount } from 'wagmi';
+import { useContractRead } from 'wagmi';
 import { message } from 'antd';
 import { TransactionReceipt, TransactionResponse } from '@ethersproject/abstract-provider';
 
@@ -31,9 +30,8 @@ interface Props {
     vault?: string;
     account?: string | undefined;
     disabled?: boolean;
-    balance? : any;
+    balance?: any;
 }
-
 
 interface VaultDisplayProps {
     expanded: boolean;
@@ -58,25 +56,25 @@ const VaultCardContainer = styled.div`
     transition: box-shadow 0.1s linear;
 `;
 
-const VaultInfoRow = ({ children , onClick}:any) => {
+const VaultInfoRow = ({ children, onClick }: any) => {
     return (
-      <Row
-        style={{
-          width: '100%',
-          padding: '10px 20px',
-          minHeight: '75px',
-          cursor: 'pointer',
-          borderRadius: '15px',
-          backgroundColor: '#fff',
-          boxShadow: '0px 2px 4px #0000004d',
-          margin: '15px 0px',
-        }}
-        onClick={onClick}
-      >
-        <Col>{children}</Col>
-      </Row>
+        <Row
+            style={{
+                width: '100%',
+                padding: '10px 20px',
+                minHeight: '75px',
+                cursor: 'pointer',
+                borderRadius: '15px',
+                backgroundColor: '#fff',
+                boxShadow: '0px 2px 4px #0000004d',
+                margin: '15px 0px',
+            }}
+            onClick={onClick}
+        >
+            <Col>{children}</Col>
+        </Row>
     );
-  };
+};
 
 const InfoBlock = styled(Col)`
     height: 100%;
@@ -194,360 +192,329 @@ const VaultCard: React.FC<Props> = (props: Props): React.ReactElement => {
 
     const [withdraw, setWithdraw] = useState(false);
     const approvedRef = useRef(false);
-        const { address, isConnected } = useAccount()
-       
+    const { address, isConnected } = useAccount();
 
-    
     async function handleApproveClick() {
         const tokenAddress = '0x4987131473ccC84FEdbf22Ab383b6188D206cc9C'; // Address of the ERC20 token contract
         const vaultAddress = '0xf6f6928cac8e59b2b12216282a3f2cd5a2b366c0'; // Address of the vault contract
-     
-    
 
         const { request } = await prepareWriteContract({
             address: tokenAddress,
             abi: BundleTokenABI,
             functionName: 'approve',
             args: [vaultAddress, toStake],
-          }); // Use the prepareWriteContract hook to prepare the contract write transaction
-      
-          const { hash } = await writeContract(request); // Use the writeContract hook to send the contract write transaction
-      
-          const transactionReceipt = await waitForTransaction({ hash }); // Use the waitForTransaction hook to wait for the transaction to be confirmed
-          console.log(transactionReceipt); // Log the transaction receipt to the console
-          if(transactionReceipt){
-            approveMessage(transactionReceipt)
-          }
-       
-      
-           approvedRef.current = true;
-           console.log(approvedRef)
-          setApproved(true);
-      }
+        }); // Use the prepareWriteContract hook to prepare the contract write transaction
 
+        const { hash } = await writeContract(request); // Use the writeContract hook to send the contract write transaction
 
-      
-  async function handleDepositClick() {
-    const vaultAddress = '0xf6f6928cac8e59b2b12216282a3f2cd5a2b366c0'; // Address of the vault contract
-    const amount = 100; // Amount to deposit (in ether)
-    const amountInWei = amount * 10**18;
+        const transactionReceipt = await waitForTransaction({ hash }); // Use the waitForTransaction hook to wait for the transaction to be confirmed
+        console.log(transactionReceipt); // Log the transaction receipt to the console
+        if (transactionReceipt) {
+            approveMessage(transactionReceipt);
+        }
 
-    const { request } = await prepareWriteContract({
-      address: vaultAddress,
-      abi: VaultABI,
-      functionName: 'deposit',
-      args: [toStake],
-    }); // Use the prepareWriteContract hook to prepare the contract write transaction
-
-    const { hash } = await writeContract(request); // Use the writeContract hook to send the contract write transaction
-  
-     const transactionReceipt = await waitForTransaction({ hash }); // Use the waitForTransaction hook to wait for the transaction to be confirmed
-     txMessage(transactionReceipt); 
- 
-      if(transactionReceipt){
-        depositMessage(transactionReceipt)
-      }
-    
-    setDeposited(true);
-    console.log(deposited);
-    
-  }
-
-
-
-      
-  async function handleWithdrawClick() {
-    const vaultAddress = '0xf6f6928cac8e59b2b12216282a3f2cd5a2b366c0'; // Address of the vault contract
-  
-
-    const { request } = await prepareWriteContract({
-      address: vaultAddress,
-      abi: VaultABI,
-      functionName: 'withdraw',
-      args: [toUnstake],
-    }); // Use the prepareWriteContract hook to prepare the contract write transaction
-
-    const { hash } = await writeContract(request); // Use the writeContract hook to send the contract write transaction
-  
-     const transactionReceipt = await waitForTransaction({ hash }); // Use the waitForTransaction hook to wait for the transaction to be confirmed
-     txMessage(transactionReceipt)
-      if(transactionReceipt){
-        withdrawMessage(transactionReceipt)
-      }
-    
-    
-      setWithdraw(true);    
-  }
-
-
- 
-   const [vbal, setVal] = useState(null)
-
-   const { data: VaultBalance, isLoading, isError } = useContractRead({
-    address: '0xf6f6928cac8e59b2b12216282a3f2cd5a2b366c0',
-    abi: VaultABI,
-    functionName: 'getBalance',
-    args: [address],
-    onSuccess(VaultBalance){
-        console.log('Sucess', VaultBalance)
-
+        approvedRef.current = true;
+        console.log(approvedRef);
+        setApproved(true);
     }
-  });
 
-  const { data: derphiBal } = useContractRead({
-    address: '0x4987131473ccC84FEdbf22Ab383b6188D206cc9C',
-    abi: BundleTokenABI,
-    functionName: 'balanceOf',
-    args: [address],
-    onSuccess(derphiBal){
-        console.log('Sucess', derphiBal)
+    async function handleDepositClick() {
+        const vaultAddress = '0xf6f6928cac8e59b2b12216282a3f2cd5a2b366c0'; // Address of the vault contract
+        const amount = 100; // Amount to deposit (in ether)
+        const amountInWei = amount * 10 ** 18;
 
+        const { request } = await prepareWriteContract({
+            address: vaultAddress,
+            abi: VaultABI,
+            functionName: 'deposit',
+            args: [toStake],
+        }); // Use the prepareWriteContract hook to prepare the contract write transaction
+
+        const { hash } = await writeContract(request); // Use the writeContract hook to send the contract write transaction
+
+        const transactionReceipt = await waitForTransaction({ hash }); // Use the waitForTransaction hook to wait for the transaction to be confirmed
+        txMessage(transactionReceipt);
+
+        if (transactionReceipt) {
+            depositMessage(transactionReceipt);
+        }
+
+        setDeposited(true);
+        console.log(deposited);
     }
-  });
 
-//   console.log(VaultBalance)
-//   console.log(isLoading)
-//   console.log(toStake)
-//   console.log(vbal)
-  const vaultBalance: BigNumber | string | number = VaultBalance as BigNumber | string | number;
+    async function handleWithdrawClick() {
+        const vaultAddress = '0xf6f6928cac8e59b2b12216282a3f2cd5a2b366c0'; // Address of the vault contract
 
-   const dfiBalance: BigNumber | string | number = derphiBal as BigNumber | string | number;
+        const { request } = await prepareWriteContract({
+            address: vaultAddress,
+            abi: VaultABI,
+            functionName: 'withdraw',
+            args: [toUnstake],
+        }); // Use the prepareWriteContract hook to prepare the contract write transaction
 
+        const { hash } = await writeContract(request); // Use the writeContract hook to send the contract write transaction
 
-  
+        const transactionReceipt = await waitForTransaction({ hash }); // Use the waitForTransaction hook to wait for the transaction to be confirmed
+        txMessage(transactionReceipt);
+        if (transactionReceipt) {
+            withdrawMessage(transactionReceipt);
+        }
 
-// If VaultBalance is not a BigNumber, convert it to one
-const balanceInWei: BigNumber = typeof vaultBalance === 'string' || typeof vaultBalance === 'number'
-  ? BigNumber.from(vaultBalance.toString())
-  : vaultBalance;
+        setWithdraw(true);
+    }
 
-// Now, you can pass balanceInWei to your parseBalance function
-const formattedBalance = parseBalance(balanceInWei);
-  
- 
+    const [vbal, setVal] = useState(null);
+
+    const {
+        data: VaultBalance,
+        isLoading,
+        isError,
+    } = useContractRead({
+        address: '0xf6f6928cac8e59b2b12216282a3f2cd5a2b366c0',
+        abi: VaultABI,
+        functionName: 'getBalance',
+        args: [address],
+        onSuccess(VaultBalance) {
+            console.log('Sucess', VaultBalance);
+        },
+    });
+
+    const { data: derphiBal } = useContractRead({
+        address: '0x4987131473ccC84FEdbf22Ab383b6188D206cc9C',
+        abi: BundleTokenABI,
+        functionName: 'balanceOf',
+        args: [address],
+        onSuccess(derphiBal) {
+            console.log('Sucess', derphiBal);
+        },
+    });
+
+    //   console.log(VaultBalance)
+    //   console.log(isLoading)
+    //   console.log(toStake)
+    //   console.log(vbal)
+    const vaultBalance: BigNumber | string | number = VaultBalance as BigNumber | string | number;
+
+    const dfiBalance: BigNumber | string | number = derphiBal as BigNumber | string | number;
+
+    // If VaultBalance is not a BigNumber, convert it to one
+    const balanceInWei: BigNumber =
+        typeof vaultBalance === 'string' || typeof vaultBalance === 'number'
+            ? BigNumber.from(vaultBalance.toString())
+            : vaultBalance;
+
+    // Now, you can pass balanceInWei to your parseBalance function
+    const formattedBalance = parseBalance(balanceInWei);
+
     function handlePercentageClick() {
         const balance = props.balance?.formatted;
         if (balance) {
-          const value = BigNumber.from(balance).div(4);
-           console.log(value);
-           
-          setToStake(value);
+            const value = BigNumber.from(balance).div(4);
+            console.log(value);
+
+            setToStake(value);
         }
-      }
-    
+    }
+
     useEffect(() => {
         if (!props.disabled) {
             getApr(setApr);
         }
     }, [props.disabled]);
 
-    console.log(approved)
-   
-   
-// const fixedPointValue = vaultBalance.toFixed(2) // Convert to a fixed-point integer
-const bigNumberValue = BigNumber.from(vaultBalance?.toString() ?? '0');
+    console.log(approved);
 
+    // const fixedPointValue = vaultBalance.toFixed(2) // Convert to a fixed-point integer
+    const bigNumberValue = BigNumber.from(vaultBalance?.toString() ?? '0');
 
+    const secNumberValue = BigNumber.from(dfiBalance?.toString() ?? '0'); // Convert to a BigNumber
 
-const secNumberValue = BigNumber.from(dfiBalance?.toString() ?? '0'); // Convert to a BigNumber
+    return (
+        <div>
+            <Card
+                className="vault-card"
+                hoverable
+                style={{
+                    borderRadius: '15px',
+                    boxShadow: '0px 2px 4px #0000004d',
+                    margin: '15px 0px',
+                }}
+            >
+                <VaultInfoRow onClick={() => setExpanded(!expanded)} align="middle" gutter={[0, 10]}>
+                    <InfoBlock xs={24} sm={24} md={24} lg={5} style={{ flexGrow: 1 }}>
+                        <ImageContainer style={{ marginLeft: '20px' }}>
+                            <Image width={55} height={55} style={props.imageStyle} alt="" src={props.image} />
+                        </ImageContainer>
+                        <TextBold style={{ marginLeft: '20px' }}>{props.name}</TextBold>
+                    </InfoBlock>
+                    <HideOnMobile>
+                        <Divider type="vertical" style={{ height: '55px' }} />
+                    </HideOnMobile>
+                    <InfoBlock xs={24} sm={24} md={24} lg={8} style={{ justifyContent: 'center', flexGrow: 1 }}>
+                        <PrimaryContainer disabled={props.disabled}>
+                            <TextBold>{`APR: ${apr}`}</TextBold>
+                        </PrimaryContainer>
+                    </InfoBlock>
+                    <HideOnMobile>
+                        <Divider type="vertical" style={{ height: '55px' }} />
+                    </HideOnMobile>
+                    <InfoBlock xs={23} sm={23} md={23} lg={9} style={{ justifyContent: 'center', flexGrow: 2 }}>
+                        {/* <Text>{`Staked: ${stakedBalance ? parseBalance(stakedBalance) : '0.00'} BDL`}</Text> */}
+                    </InfoBlock>
+                    <InfoBlock xs={1} sm={1} md={1} lg={1}>
+                        {expanded ? (
+                            <UpOutlined style={{ marginBottom: '3px' }} />
+                        ) : (
+                            <DownOutlined style={{ marginBottom: '3px' }} />
+                        )}
+                    </InfoBlock>
+                </VaultInfoRow>
+                <VaultDisplay expanded={expanded}>
+                    <Divider style={{ margin: '5px 0px' }} />
+                    <Row justify="center" style={{ padding: '10px 20px 0px 20px' }}>
+                        <Col xs={24} sm={24} md={6} flex="">
+                            {/* <Text style={{ margin: '0px' }}>Available: {`${parseBalance(unstakedBalance) || '0.00'}`}</Text> */}
+                            <Text style={{ margin: '0px' }}>
+                                Available:{' '}
+                                {`${props.balance?.formatted ? Number(props.balance.formatted).toFixed(2) : '0.00'}`}
+                            </Text>
 
+                            {/* <Text style={{ margin: '0px' }}>Available: {`${  parseBalance(VaultBalance) || '0.00' }`}</Text> */}
 
-
-
-
-
-  return (
-    <div>
-           <Card
-      className="vault-card"
-      hoverable
-      style={{
-        borderRadius: '15px',
-        boxShadow: '0px 2px 4px #0000004d',
-        margin: '15px 0px',
-      }}>
-
-            <VaultInfoRow onClick={() => setExpanded(!expanded)} align="middle" gutter={[0, 10]}>
-                <InfoBlock xs={24} sm={24} md={24} lg={5} style={{ flexGrow: 1 }}>
-                    <ImageContainer style={{ marginLeft: '20px' }}>
-                        <Image width={55} height={55} style={props.imageStyle} alt="" src={props.image}/>
-                    </ImageContainer>
-                    <TextBold style={{ marginLeft: '20px' }}>{props.name}</TextBold>
-                </InfoBlock>
-                <HideOnMobile>
-                    <Divider type="vertical" style={{ height: '55px' }} />
-                </HideOnMobile>
-                <InfoBlock xs={24} sm={24} md={24} lg={8} style={{ justifyContent: 'center', flexGrow: 1 }}>
-                    <PrimaryContainer disabled={props.disabled}>
-                        <TextBold>{`APR: ${apr}`}</TextBold>
-                    </PrimaryContainer>
-                </InfoBlock>
-                <HideOnMobile>
-                    <Divider type="vertical" style={{ height: '55px' }} />
-                </HideOnMobile>
-                <InfoBlock xs={23} sm={23} md={23} lg={9} style={{ justifyContent: 'center', flexGrow: 2 }}>
-                    {/* <Text>{`Staked: ${stakedBalance ? parseBalance(stakedBalance) : '0.00'} BDL`}</Text> */}
-                </InfoBlock>
-                <InfoBlock xs={1} sm={1} md={1} lg={1}>
-                    {expanded ? (
-                        <UpOutlined style={{ marginBottom: '3px' }} />
-                    ) : (
-                        <DownOutlined style={{ marginBottom: '3px' }} />
-                    )}
-                </InfoBlock>
-            </VaultInfoRow>
-            <VaultDisplay expanded={expanded}>
-                <Divider style={{ margin: '5px 0px' }} />
-                <Row justify="center" style={{ padding: '10px 20px 0px 20px' }}>
-                    <Col xs={24} sm={24} md={6} flex="">
-                        {/* <Text style={{ margin: '0px' }}>Available: {`${parseBalance(unstakedBalance) || '0.00'}`}</Text> */}
-                        <Text style={{ margin: '0px' }}>Available: {`${(props.balance?.formatted ? Number(props.balance.formatted).toFixed(2) : '0.00')}`}</Text>
-
-                      
-                        {/* <Text style={{ margin: '0px' }}>Available: {`${  parseBalance(VaultBalance) || '0.00' }`}</Text> */}
-                      
-                        <InputNumber
-                            stringMode={true}
-                            min={'0'}
-                            style={{ width: '100%', margin: '10px 0px 10px 0px' }}
-                            value={formatUnits(toStake, 18)}
-                            onChange={(newValue) => {
-                                if (newValue !== null) {
-                                    setToStake(parseEther(newValue));
+                            <InputNumber
+                                stringMode={true}
+                                min={'0'}
+                                style={{ width: '100%', margin: '10px 0px 10px 0px' }}
+                                value={formatUnits(toStake, 18)}
+                                onChange={(newValue) => {
+                                    if (newValue !== null) {
+                                        setToStake(parseEther(newValue));
+                                    }
+                                }}
+                                disabled={
+                                    props.disabled ||
+                                    !props.balance?.formatted ||
+                                    (props.balance?.formatted <= BigNumber.from(0) && typeof props.account === 'string')
                                 }
-                        
-                            }}
-                            disabled={
-                                props.disabled ||
-                                !props.balance?.formatted ||
-                                (props.balance?.formatted <= BigNumber.from(0) && typeof props.account === 'string')
-                            }
-                            size="large"
-                        />
-                    </Col>
-                    <Col xs={24} sm={24} md={6}>
-                        <PercentageContainer>
-                            <Percentage onClick={() => setToStake(secNumberValue.div(4))}>
-                                <div>25%</div>
-                            </Percentage>
-                            <PercentageDivider />
-                            <Percentage onClick={() => setToStake(secNumberValue.div(2))}>
-                                <div>50%</div>
-                            </Percentage>
-                            <PercentageDivider />
-                            <Percentage onClick={() =>  setToStake(secNumberValue.mul(3).div(4))}>
-                                <div>75%</div>
-                            </Percentage>
-                            <PercentageDivider />
-                            <Percentage onClick={() => setToStake(secNumberValue)}>
-                                <div>100%</div>
-                            </Percentage>
-                        </PercentageContainer>
-                        <OutlinedButton
-                            style={{
-                                height: '38px',
-                                margin: '12px auto',
-                                width: '80%',
-                                padding: '0px',
-                                display: 'block',
-                            }}
-                            disabled={
-                                props.disabled ||
-                               
-                                (approvedRef &&
-                                    (!props.balance?.formatted || (props.balance?.formatted <= 0 && typeof props.account === 'string')))
-                            }
-                            onClick={() => {
-                             
-                                if (approvedRef) {
-                                    handleDepositClick()
-                                } else{
-                                    handleApproveClick()
+                                size="large"
+                            />
+                        </Col>
+                        <Col xs={24} sm={24} md={6}>
+                            <PercentageContainer>
+                                <Percentage onClick={() => setToStake(secNumberValue.div(4))}>
+                                    <div>25%</div>
+                                </Percentage>
+                                <PercentageDivider />
+                                <Percentage onClick={() => setToStake(secNumberValue.div(2))}>
+                                    <div>50%</div>
+                                </Percentage>
+                                <PercentageDivider />
+                                <Percentage onClick={() => setToStake(secNumberValue.mul(3).div(4))}>
+                                    <div>75%</div>
+                                </Percentage>
+                                <PercentageDivider />
+                                <Percentage onClick={() => setToStake(secNumberValue)}>
+                                    <div>100%</div>
+                                </Percentage>
+                            </PercentageContainer>
+                            <Outline
+                                style={{
+                                    height: '38px',
+                                    margin: '12px auto',
+                                    width: '80%',
+                                    padding: '0px',
+                                    display: 'block',
+                                }}
+                                disabled={
+                                    props.disabled ||
+                                    (approvedRef &&
+                                        (!props.balance?.formatted ||
+                                            (props.balance?.formatted <= 0 && typeof props.account === 'string')))
                                 }
-                            }}
-                        >
-                           {approvedRef? 'Deposit' : 'Approve'}
-                        </OutlinedButton>
-                        {/* <OutlinedButton  onClick={() => handleApproveClick()}>
+                                onClick={() => {
+                                    if (approvedRef) {
+                                        handleDepositClick();
+                                    } else {
+                                        handleApproveClick();
+                                    }
+                                }}
+                            >
+                                {approvedRef ? 'Deposit' : 'Approve'}
+                            </Outline>
+                            {/* <OutlinedButton  onClick={() => handleApproveClick()}>
                             Approve
                         </OutlinedButton>
                         <OutlinedButton  onClick={() => handleDepositClick()}>
                             Deposit
                         </OutlinedButton> */}
-                        {/* <OutlinedButton  onClick={() => handleWithdrawClick()}>
+                            {/* <OutlinedButton  onClick={() => handleWithdrawClick()}>
                             Withdraw
                         </OutlinedButton> */}
-                        
-                    </Col>
-                    <Col xs={24} sm={24} md={6}>
-                          
-                        <Text style={{ margin: '0px' }}>Available: {`${  formattedBalance  }`}</Text>
-                        <InputNumber
-                            stringMode={true}
-                            min={'0'}
-                            style={{ width: '100%', margin: '10px 0px 10px 0px' }}
-                            value={formatUnits(toUnstake, 18)}
-                            onChange={(newValue) => {
-                                if (newValue !== null) {
-                                    setToUnstake(parseEther(newValue));
+                        </Col>
+                        <Col xs={24} sm={24} md={6}>
+                            <Text style={{ margin: '0px' }}>Available: {`${formattedBalance}`}</Text>
+                            <InputNumber
+                                stringMode={true}
+                                min={'0'}
+                                style={{ width: '100%', margin: '10px 0px 10px 0px' }}
+                                value={formatUnits(toUnstake, 18)}
+                                onChange={(newValue) => {
+                                    if (newValue !== null) {
+                                        setToUnstake(parseEther(newValue));
+                                    }
+                                }}
+                                disabled={
+                                    props.disabled ||
+                                    !vaultBalance ||
+                                    (vaultBalance <= BigNumber.from(0) && typeof props.account === 'string')
                                 }
-                        
-                            }}
-                            disabled={
-                                props.disabled ||
-                                !vaultBalance ||
-                                (vaultBalance <= BigNumber.from(0) && typeof props.account === 'string')
-                            }
-                            size="large"
-                        />
-                    </Col>
-                    <Col xs={24} sm={24} md={6}>
-                        <PercentageContainer>
-                            <Percentage onClick={() => setToUnstake(bigNumberValue.div(4))}>
-                                <div>25%</div>
-                            </Percentage>
-                            <PercentageDivider />
-                            <Percentage onClick={() => setToUnstake(bigNumberValue.div(2))}>
-                                <div>50%</div>
-                            </Percentage>
-                            <PercentageDivider />
-                            <Percentage onClick={() => setToUnstake(bigNumberValue.mul(3).div(4))}>
-                                <div>75%</div>
-                            </Percentage>
-                            <PercentageDivider />
-                            <Percentage onClick={() => setToUnstake(bigNumberValue)}>
-                                <div>100%</div>
-                            </Percentage>
-                        </PercentageContainer>
-                        <OutlinedButton
-                            style={{
-                                height: '38px',
-                                margin: '12px auto',
-                                width: '80%',
-                                padding: '0px',
-                                display: 'block',
-                            }}
-                            disabled={
-                                props.disabled ||
-                                approvedRef &&
-                                    !formattedBalance 
-                            }
-                               onClick={() => {
-                                 if (approvedRef) {
-                                    handleWithdrawClick()
-                                 } else{
-                                     handleApproveClick()
-                                 }
-                            }}
-                        >
-                            {approvedRef ? 'Withdraw' : 'Approve'}
-                        </OutlinedButton>
-                    </Col>
-                </Row>
-            </VaultDisplay>
-        </Card>
-    </div>
-  )
-}
+                                size="large"
+                            />
+                        </Col>
+                        <Col xs={24} sm={24} md={6}>
+                            <PercentageContainer>
+                                <Percentage onClick={() => setToUnstake(bigNumberValue.div(4))}>
+                                    <div>25%</div>
+                                </Percentage>
+                                <PercentageDivider />
+                                <Percentage onClick={() => setToUnstake(bigNumberValue.div(2))}>
+                                    <div>50%</div>
+                                </Percentage>
+                                <PercentageDivider />
+                                <Percentage onClick={() => setToUnstake(bigNumberValue.mul(3).div(4))}>
+                                    <div>75%</div>
+                                </Percentage>
+                                <PercentageDivider />
+                                <Percentage onClick={() => setToUnstake(bigNumberValue)}>
+                                    <div>100%</div>
+                                </Percentage>
+                            </PercentageContainer>
+                            <Outline
+                                style={{
+                                    height: '38px',
+                                    margin: '12px auto',
+                                    width: '80%',
+                                    padding: '0px',
+                                    display: 'block',
+                                }}
+                                disabled={props.disabled || (approvedRef && !formattedBalance)}
+                                onClick={() => {
+                                    if (approvedRef) {
+                                        handleWithdrawClick();
+                                    } else {
+                                        handleApproveClick();
+                                    }
+                                }}
+                            >
+                                {approvedRef ? 'Withdraw' : 'Approve'}
+                            </Outline>
+                        </Col>
+                    </Row>
+                </VaultDisplay>
+            </Card>
+        </div>
+    );
+};
 
-export default VaultCard
+export default VaultCard;
