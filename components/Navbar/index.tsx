@@ -72,7 +72,7 @@ const MenuCol = ({ children }: any) => (
 );
 
 const NavMenuItem = ({ children }: any) => (
-    <Menu.Item
+    <div
         style={{
             height: '100%',
             width: 'auto',
@@ -93,7 +93,7 @@ const NavMenuItem = ({ children }: any) => (
         >
             {children}
         </a>
-    </Menu.Item>
+    </div>
 );
 
 const NavMenuCol = ({ children }: any) => (
