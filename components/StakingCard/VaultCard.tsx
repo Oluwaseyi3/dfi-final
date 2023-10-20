@@ -1,18 +1,20 @@
 import React from 'react';
-import Divider from 'antd/lib/divider';
-import { useEffect, useState, useRef } from 'react';
+
+import { useEffect, useState, useRef, ReactNode } from 'react';
 import styled from 'styled-components';
 import { formatNumber, getNamedAddress, parseBalance } from '../../util';
 import BundleTokenABI from '../../contracts/BundleToken.json';
 import VaultABI from '../../contracts/Vault.json';
 import Image from 'next/image';
 import { DownOutlined, UpOutlined } from '@ant-design/icons';
-import { Col, Row, InputNumber } from 'antd';
+import { Col, Row, InputNumber, Card, Typography, Button, Avatar, Collapse, Divider } from 'antd';
 import Outline from '../Button/Outline';
 import { fetchPrice } from '../../lib/coingecko';
 import { formatUnits, parseEther } from '@ethersproject/units';
 import { Contract } from '@ethersproject/contracts';
 import { BigNumber } from '@ethersproject/bignumber';
+
+import 'react-toastify/dist/ReactToastify.css';
 import { approveMessage, depositMessage, txMessage, withdrawMessage } from '../Messages';
 import { prepareWriteContract, waitForTransaction, writeContract } from '@wagmi/core';
 import { useAccount } from 'wagmi';
@@ -41,128 +43,167 @@ interface Disableable {
     disabled?: boolean;
 }
 
-const VaultCardContainer = styled.div`
-    width: 100%;
-    height: auto;
-    border-radius: 15px;
-    background-color: ${(props) => props.theme.white};
-    box-shadow: 0px 2px 4px #0000004d;
-    margin: 15px 0px;
+const customStyles = {
+    width: '100%',
+    height: 'auto',
+    borderRadius: '15px',
+    backgroundColor: 'white', // Replace with your desired white color
+    boxShadow: '0px 2px 4px #0000004d',
+    margin: '15px 0px',
+    transition: 'box-shadow 0.1s linear',
+};
 
-    &:hover {
-        box-shadow: 0px 3px 4px #0000004d;
-    }
+const hoverStyles = {
+    boxShadow: '0px 3px 4px #0000004d',
+};
 
-    transition: box-shadow 0.1s linear;
-`;
+export const VaultCardContainer = ({ children }: any) => {
+    const [isHovered, setHovered] = React.useState(false);
 
-const VaultInfoRow = ({ children, onClick }: any) => {
     return (
-        <Row
-            style={{
-                width: '100%',
-                padding: '10px 20px',
-                minHeight: '75px',
-                cursor: 'pointer',
-                borderRadius: '15px',
-                backgroundColor: '#fff',
-                boxShadow: '0px 2px 4px #0000004d',
-                margin: '15px 0px',
-            }}
-            onClick={onClick}
+        <Card
+            style={isHovered ? { ...customStyles, ...hoverStyles } : customStyles}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
         >
-            <Col>{children}</Col>
-        </Row>
+            {children}
+        </Card>
     );
 };
 
-const InfoBlock = styled(Col)`
-    height: 100%;
-    display: flex;
-    align-items: center;
-`;
+const customSztyles = {
+    width: '100%',
+    padding: '10px 20px',
+    minHeight: '75px',
+    cursor: 'pointer',
+};
 
-const TextBold = styled.div`
-    font-size: 16px;
-    font-weight: bold;
-    font-family: 'Visuelt';
-    margin: 3px 10px 0px 10px;
-`;
+export const VaultInfoRow = ({ children }: any) => <Row style={customSztyles}>{children}</Row>;
 
-const PrimaryContainer = styled.div<Disableable>`
-    height: 100%;
-    background-color: ${(props) => (props.disabled ? props.theme.spaceGrey : props.theme.primary)};
-    color: ${(props) => (props.disabled ? 'default' : props.theme.white)};
-    border-radius: 15px;
-    margin: 0px 10px;
-`;
+const cusstomStyles = {
+    height: '100%',
+    display: 'flex',
+    alignItems: 'center',
+};
 
-const Text = styled.div`
-    font-size: 16px;
-    font-family: 'Visuelt';
-    margin: 3px 10px 0px 10px;
-`;
+export const InfoBlock = ({ children }: any) => <Col style={cusstomStyles}>{children}</Col>;
 
-const ImageContainer = styled.div`
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    box-shadow: 2px 2px 5px #00000012;
-    margin-right: 10px;
-    z-index: 2;
-    background-color: ${(props) => props.theme.white};
-`;
+const { Text } = Typography;
 
-const VaultDisplay = styled.div<VaultDisplayProps>`
-    height: ${(props) => (props.expanded ? 'auto' : '0px')};
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-`;
+const custasaomStyles = {
+    fontSize: '16px',
+    fontWeight: 'bold',
+    fontFamily: 'Visuelt',
+    margin: '3px 10px 0px 10px',
+};
 
-const PercentageContainer = styled.div`
-    display: flex;
-    flex-direction: row;
-    border: ${(props) => `1px solid ${props.theme.grey}`};
-    border-radius: 15px;
-    height: 26px;
-    width: 80%;
-    overflow: hidden;
-    margin: 0px auto;
-`;
+export const TextBold = ({ children }: any) => <Text style={custasaomStyles}>{children}</Text>;
 
-const Percentage = styled.div`
-    cursor: pointer;
-    flex: 1;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+const PrimaryContainer = ({ disabled, children }: any) => {
+    const containerStyles = {
+        height: '100%',
+        backgroundColor: disabled ? '#808080' : '#0000FF',
+        color: disabled ? 'default' : 'white',
+        borderRadius: '15px',
+        margin: '0px 10px',
+    };
 
-    &:hover {
-        background-color: ${(props) => props.theme.spaceGrey};
-    }
+    return <div style={containerStyles}>{children}</div>;
+};
 
-    transition: background-color 100ms linear;
-`;
+const customASStyles = {
+    width: '55px',
+    height: '55px',
+    boxShadow: '2px 2px 5px #00000012',
+    marginRight: '10px',
+    zIndex: 2,
+    backgroundColor: 'white', // Replace with your desired background color
+};
 
-const PercentageDivider = styled.div`
-    width: 1px;
-    height: 100%;
-    background-color: ${(props) => props.theme.grey};
-`;
+const ImageContainer = ({ children }: any) => (
+    <Avatar size={55} style={customASStyles}>
+        {children}
+    </Avatar>
+);
 
-const HideOnMobile = styled.div`
-    display: block;
+const { Panel } = Collapse;
 
-    @media (max-width: 1000px) {
-        display: none;
-    }
-`;
+interface CustomCollapsePanelProps {
+    header: ReactNode;
+    children: ReactNode;
+    expanded: boolean;
+}
 
-const LiquidityText = styled.span`
-    color: ${(props) => props.theme.primary};
-`;
+const VaultDisplay = ({ header, children, expanded }: CustomCollapsePanelProps) => {
+    return (
+        <Collapse ghost defaultActiveKey={expanded ? '1' : undefined}>
+            {expanded && (
+                <Panel key="1" header={header}>
+                    {children}
+                </Panel>
+            )}
+        </Collapse>
+    );
+};
+
+const PercentageContainer = ({ children }: any) => (
+    <Row justify="center">
+        <Col span={20}>
+            <div
+                style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    border: `1px solid your-grey-color`, // Replace with your desired grey color
+                    borderRadius: '15px',
+                    height: '26px',
+                    overflow: 'hidden',
+                }}
+            >
+                {children}
+            </div>
+        </Col>
+    </Row>
+);
+
+const customStueyles = {
+    cursor: 'pointer',
+    flex: 1,
+    height: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    transition: 'background-color 100ms linear',
+};
+
+const hoversStyles = {
+    backgroundColor: '#0000FF', // Replace with your desired space grey color
+};
+
+const Percentage = ({ children }: any) => (
+    <Col span={24} style={{ ...customStueyles, ...hoversStyles }}>
+        {children}
+    </Col>
+);
+
+const acustomStyles = {
+    width: '1px',
+    height: '100%',
+    backgroundColor: '#808080', // Replace with your desired grey color
+};
+
+const PercentageDivider = () => <Divider style={acustomStyles} type="vertical" />;
+
+const HideOnMobile = ({ children }: any) => (
+    <Col xs={{ span: 24 }} lg={{ span: 0 }}>
+        {children}
+    </Col>
+);
+
+const customSsstyles = {
+    color: '#0000FF', // Replace with your desired primary color
+};
+
+const LiquidityText = ({ children }: any) => <Text style={customStyles}>{children}</Text>;
 
 const getApr = async (
     setApr: React.Dispatch<React.SetStateAction<string>>,
@@ -189,7 +230,7 @@ const VaultCard: React.FC<Props> = (props: Props): React.ReactElement => {
     const [toUnstake, setToUnstake] = useState(BigNumber.from(0));
     const [approved, setApproved] = useState(false);
     const [deposited, setDeposited] = useState(false);
-
+    const [isHovered, setHovered] = React.useState(false);
     const [withdraw, setWithdraw] = useState(false);
     const approvedRef = useRef(false);
     const { address, isConnected } = useAccount();
@@ -332,15 +373,7 @@ const VaultCard: React.FC<Props> = (props: Props): React.ReactElement => {
 
     return (
         <div>
-            <Card
-                className="vault-card"
-                hoverable
-                style={{
-                    borderRadius: '15px',
-                    boxShadow: '0px 2px 4px #0000004d',
-                    margin: '15px 0px',
-                }}
-            >
+            <VaultCardContainer>
                 <VaultInfoRow onClick={() => setExpanded(!expanded)} align="middle" gutter={[0, 10]}>
                     <InfoBlock xs={24} sm={24} md={24} lg={5} style={{ flexGrow: 1 }}>
                         <ImageContainer style={{ marginLeft: '20px' }}>
@@ -370,9 +403,9 @@ const VaultCard: React.FC<Props> = (props: Props): React.ReactElement => {
                         )}
                     </InfoBlock>
                 </VaultInfoRow>
-                <VaultDisplay expanded={expanded}>
+                <VaultDisplay expanded={true} header="Your Header Text">
                     <Divider style={{ margin: '5px 0px' }} />
-                    <Row justify="center" style={{ padding: '10px 20px 0px 20px' }}>
+                    <Row justify="center" align="middle" style={{ padding: '10px 20px 0px 20px' }}>
                         <Col xs={24} sm={24} md={6} flex="">
                             {/* <Text style={{ margin: '0px' }}>Available: {`${parseBalance(unstakedBalance) || '0.00'}`}</Text> */}
                             <Text style={{ margin: '0px' }}>
@@ -418,7 +451,7 @@ const VaultCard: React.FC<Props> = (props: Props): React.ReactElement => {
                                     <div>100%</div>
                                 </Percentage>
                             </PercentageContainer>
-                            <Outline
+                            <div
                                 style={{
                                     height: '38px',
                                     margin: '12px auto',
@@ -426,22 +459,26 @@ const VaultCard: React.FC<Props> = (props: Props): React.ReactElement => {
                                     padding: '0px',
                                     display: 'block',
                                 }}
-                                disabled={
-                                    props.disabled ||
-                                    (approvedRef &&
-                                        (!props.balance?.formatted ||
-                                            (props.balance?.formatted <= 0 && typeof props.account === 'string')))
-                                }
-                                onClick={() => {
-                                    if (approvedRef) {
-                                        handleDepositClick();
-                                    } else {
-                                        handleApproveClick();
-                                    }
-                                }}
                             >
-                                {approvedRef ? 'Deposit' : 'Approve'}
-                            </Outline>
+                                <Outline
+                                    disabled={
+                                        props.disabled ||
+                                        (approvedRef &&
+                                            (!props.balance?.formatted ||
+                                                (props.balance?.formatted <= 0 && typeof props.account === 'string')))
+                                    }
+                                    onClick={() => {
+                                        if (approvedRef) {
+                                            handleDepositClick();
+                                        } else {
+                                            handleApproveClick();
+                                        }
+                                    }}
+                                >
+                                    {approvedRef ? 'Deposit' : 'Approve'}
+                                </Outline>
+                            </div>
+
                             {/* <OutlinedButton  onClick={() => handleApproveClick()}>
                             Approve
                         </OutlinedButton>
@@ -490,7 +527,7 @@ const VaultCard: React.FC<Props> = (props: Props): React.ReactElement => {
                                     <div>100%</div>
                                 </Percentage>
                             </PercentageContainer>
-                            <Outline
+                            <div
                                 style={{
                                     height: '38px',
                                     margin: '12px auto',
@@ -498,21 +535,31 @@ const VaultCard: React.FC<Props> = (props: Props): React.ReactElement => {
                                     padding: '0px',
                                     display: 'block',
                                 }}
-                                disabled={props.disabled || (approvedRef && !formattedBalance)}
-                                onClick={() => {
-                                    if (approvedRef) {
-                                        handleWithdrawClick();
-                                    } else {
-                                        handleApproveClick();
-                                    }
-                                }}
                             >
-                                {approvedRef ? 'Withdraw' : 'Approve'}
-                            </Outline>
+                                <Outline
+                                    style={{
+                                        height: '38px',
+                                        margin: '12px auto',
+                                        width: '80%',
+                                        padding: '0px',
+                                        display: 'block',
+                                    }}
+                                    disabled={props.disabled || (approvedRef && !formattedBalance)}
+                                    onClick={() => {
+                                        if (approvedRef) {
+                                            handleWithdrawClick();
+                                        } else {
+                                            handleApproveClick();
+                                        }
+                                    }}
+                                >
+                                    {approvedRef ? 'Withdraw' : 'Approve'}
+                                </Outline>
+                            </div>
                         </Col>
                     </Row>
                 </VaultDisplay>
-            </Card>
+            </VaultCardContainer>
         </div>
     );
 };
